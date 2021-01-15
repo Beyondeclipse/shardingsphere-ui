@@ -21,17 +21,17 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.shardingsphere.masterslave.api.config.MasterSlaveRuleConfiguration;
-import org.apache.shardingsphere.orchestration.core.configuration.DataSourceConfigurationYamlSwapper;
-import org.apache.shardingsphere.orchestration.core.configuration.YamlDataSourceConfiguration;
+import org.apache.shardingsphere.governance.core.yaml.config.YamlDataSourceConfiguration;
+import org.apache.shardingsphere.governance.core.yaml.swapper.DataSourceConfigurationYamlSwapper;
 import org.apache.shardingsphere.infra.auth.Authentication;
 import org.apache.shardingsphere.infra.auth.yaml.config.YamlAuthenticationConfiguration;
 import org.apache.shardingsphere.infra.auth.yaml.swapper.AuthenticationYamlSwapper;
-import org.apache.shardingsphere.infra.config.DataSourceConfiguration;
 import org.apache.shardingsphere.infra.config.RuleConfiguration;
+import org.apache.shardingsphere.infra.config.datasource.DataSourceConfiguration;
 import org.apache.shardingsphere.infra.yaml.config.YamlRootRuleConfigurations;
 import org.apache.shardingsphere.infra.yaml.engine.YamlEngine;
 import org.apache.shardingsphere.infra.yaml.swapper.YamlRuleConfigurationSwapperEngine;
+import org.apache.shardingsphere.replicaquery.api.config.ReplicaQueryRuleConfiguration;
 
 import java.util.Collection;
 import java.util.Map;
@@ -53,7 +53,7 @@ public final class ConfigurationYamlConverter {
     @SuppressWarnings("unchecked")
     public static Map<String, DataSourceConfiguration> loadDataSourceConfigurations(final String data) {
         Map<String, YamlDataSourceConfiguration> result = (Map) YamlEngine.unmarshal(data);
-        Preconditions.checkState(null != result && !result.isEmpty(), "No available data sources to load for orchestration.");
+        Preconditions.checkState(null != result && !result.isEmpty(), "No available data sources to load for governance.");
         return Maps.transformValues(result, new DataSourceConfigurationYamlSwapper()::swapToObject);
     }
     
@@ -68,15 +68,15 @@ public final class ConfigurationYamlConverter {
     }
     
     /**
-     * Load master-slave rule configuration.
+     * Load replica query rule configuration.
      *
      * @param data data
-     * @return master-slave rule configuration
+     * @return replica query rule configuration
      */
-    public static MasterSlaveRuleConfiguration loadMasterSlaveRuleConfiguration(final String data) {
+    public static ReplicaQueryRuleConfiguration loadPrimaryReplicaRuleConfiguration(final String data) {
         Collection<RuleConfiguration> ruleConfigurations = loadRuleConfigurations(data);
-        Optional<MasterSlaveRuleConfiguration> result = ruleConfigurations.stream().filter(
-            each -> each instanceof MasterSlaveRuleConfiguration).map(ruleConfiguration -> (MasterSlaveRuleConfiguration) ruleConfiguration).findFirst();
+        Optional<ReplicaQueryRuleConfiguration> result = ruleConfigurations.stream().filter(
+            each -> each instanceof ReplicaQueryRuleConfiguration).map(ruleConfiguration -> (ReplicaQueryRuleConfiguration) ruleConfiguration).findFirst();
         Preconditions.checkState(result.isPresent());
         return result.get();
     }

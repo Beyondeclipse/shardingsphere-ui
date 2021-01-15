@@ -62,9 +62,11 @@ curl -X GET http://localhost:8088/api/reg-center
 | name               | String     | Name of Registration Center                 |
 | registryCenterType | String     | Registry type: "zookeeper" / "etcd"         |
 | serverLists        | String     | Service address of Registration Center      |
-| namespace          | String     | Namespace of the registry                   |
-| orchestrationName  | String     | Data governance instance name               |
+| governanceName  | String     | Governance instance name               |
 | digest             | String     | Permission token to connect to the registry |
+| additionalConfigCenterType | String     | Additional config center type: "zookeeper" / "etcd"         |
+| additionalConfigCenterServerList        | String     | Service address of additional config center      |
+| additionalDigest             | String     | Permission token to connect to the additional config center |
 | activated          | Boolean    | Is it active                                |
 
 ```
@@ -77,18 +79,22 @@ curl -X GET http://localhost:8088/api/reg-center
       "name": "string",
       "registryCenterType": "Zookeeper",
       "serverLists": "string",
-      "namespace": "string",
-      "orchestrationName": "string",
+      "governanceName": "string",
       "digest": "string",
+      "additionalConfigCenterType": "Zookeeper",
+      "additionalConfigCenterServerList": "string",
+      "additionalDigest": "string",
       "activated": true
     },
     {
       "name": "string",
       "registryCenterType": "Etcd",
       "serverLists": "string",
-      "namespace": "string",
-      "orchestrationName": "string",
+      "governanceName": "string",
       "digest": "string",
+      "additionalConfigCenterType": "Zookeeper",
+      "additionalConfigCenterServerList": "string",
+      "additionalDigest": "string",
       "activated": false
     }
   ]
@@ -110,19 +116,22 @@ curl -X POST http://localhost:8088/api/reg-center
 | Parameter          | Field type | Essential | Describe                                    |
 | ------------------ | ---------- | --------- | ------------------------------------------- |
 | name               | String     | Y         | Name of Registration Center                 |
+| governanceName  | String     | Y         | Data governance instance name               |
 | registryCenterType | String     | Y         | Registry type: "zookeeper" / "etcd"         |
 | serverLists        | String     | Y         | Service address of Registration Center      |
-| namespace          | String     | Y         | Namespace of the registry                   |
-| orchestrationName  | String     | Y         | Data governance instance name               |
 | digest             | String     | N         | Permission token to connect to the registry |
+| additionalConfigCenterType | String     | N         | Additional config center type: "zookeeper" / "etcd"         |
+| additionalConfigCenterServerList        | String     | N         | Service address of additional config center      |
+| additionalDigest             | String     | N         | Permission token to connect to the additional config center |
 
 ```
 {
   "name": "string",
-  "namespace": "string",
-  "orchestrationName": "string",
+  "governanceName": "string",
   "registryCenterType": "Zookeeper",
   "serverLists": "string"
+  "additionalConfigCenterType": "Zookeeper",
+  "additionalConfigCenterServerList": "string"
 }
 ```
 
@@ -210,9 +219,11 @@ GET /api/reg-center/activated
 | name               | String     | Name of Registration Center                 |
 | registryCenterType | String     | Registry type: "zookeeper" / "etcd"         |
 | serverLists        | String     | Service address of Registration Center      |
-| namespace          | String     | Namespace of the registry                   |
-| orchestrationName  | String     | Data governance instance name               |
+| governanceName     | String     | Data governance instance name               |
 | digest             | String     | Permission token to connect to the registry |
+| additionalConfigCenterType | String     | Additional config center type: "zookeeper" / "etcd"         |
+| additionalConfigCenterServerList        | String     | Service address of additional config center      |
+| additionalDigest             | String     | Permission token to connect to the additional config center |
 | activated          | Boolean    | Is it active                                |
 
 ```
@@ -224,9 +235,11 @@ GET /api/reg-center/activated
     "name": "string",
     "registryCenterType": "Zookeeper",
     "serverLists": "string",
-    "namespace": "string",
-    "orchestrationName": "string",
+    "governanceName": "string",
     "digest": "string",
+    "additionalConfigCenterType": "Zookeeper",
+    "additionalConfigCenterServerList": "string",
+    "additionalDigest": "string",
     "activated": true
   }
 }
@@ -256,7 +269,7 @@ GET /api/reg-center/activated
   "success": true,
   "errorCode": 0,
   "errorMsg": null,
-  "model": ["sharding_order", "sharding_db", "master_slave_db"]
+  "model": ["sharding_order", "sharding_db", "primary_replica_db"]
 }
 ```
 
@@ -419,71 +432,9 @@ GET /api/reg-center/activated
 {"success":true,"errorCode":0,"errorMsg":null,"model":null}
 ```
 
-## 5.Configuration center configmap configuration related interfaces
+## 5.Configuration center properties configuration related interfaces
 
-### 5.1 Get configmap configuration
-
-`GET /api/config-map`
-
-#### Request
-
-无
-
-#### Response
-
-| Parameter | Field type | Describe                  |
-| --------- | ---------- | ------------------------- |
-| success   | Boolean    | Is the request successful |
-| errorCode | Integer    | Error code                |
-| errorMsg  | String     | Wrong description         |
-| model     | Map        | config map                |
-
-```
-{
-  "success": true,
-  "errorCode": 0,
-  "errorMsg": null,
-  "model": {
-    "sharding-key1": "sharding-value1",
-    "sharding-key2": "sharding-value2",
-    "master-slave-key0": "master-slave-value0",
-    "master-slave-key1": "master-slave-value1"
-  }
-}
-```
-
-### 5.2 Modify configmap configuration
-
-`PUT /api/config-map`
-
-#### Request
-
-**ConfigMap**
-
-```
-{
-  "sharding-key1": "sharding-value1",
-  "sharding-key2": "sharding-value2",
-  "master-slave-key0": "master-slave-value0",
-  "master-slave-key1": "master-slave-value1"
-}
-```
-
-#### Response
-
-| Parameter | Field type | Describe                  |
-| --------- | ---------- | ------------------------- |
-| success   | Boolean    | Is the request successful |
-| errorCode | Integer    | Error code                |
-| errorMsg  | String     | Wrong description         |
-
-```
-{"success":true,"errorCode":0,"errorMsg":null,"model":null}
-```
-
-## 6.Configuration center properties configuration related interfaces
-
-### 6.1 Get property configuration
+### 5.1 Get property configuration
 
 `GET /api/properties`
 
@@ -504,7 +455,7 @@ GET /api/reg-center/activated
 {"success":true,"errorCode":0,"errorMsg":null,"model":"yaml string"}
 ```
 
-### 6.2 Modify property configuration
+### 5.2 Modify property configuration
 
 `PUT /api/properties`
 
@@ -530,11 +481,11 @@ GET /api/reg-center/activated
 {"success":true,"errorCode":0,"errorMsg":null,"model":null}
 ```
 
-## 7.Arrange interfaces related to governance
+## 6.Arrange interfaces related to governance
 
-### 7.1 Get running instance information
+### 6.1 Get running instance information
 
-`GET /api/orchestration/instance`
+`GET /api/governance/instance`
 
 #### Request
 
@@ -562,9 +513,9 @@ _Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java
 }
 ```
 
-### 7.2 Modify running instance status
+### 6.2 Modify running instance status
 
-`PUT /api/orchestration/instance`
+`PUT /api/governance/instance`
 
 #### Request
 
@@ -589,9 +540,9 @@ _Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java
 {"success":true,"errorCode":0,"errorMsg":null,"model":null}
 ```
 
-### 7.3 Get from library information
+### 6.3 Get replica data source information
 
-`GET /api/orchestration/datasource`
+`GET /api/governance/datasource`
 
 #### Request
 
@@ -599,17 +550,17 @@ _Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java
 
 #### Response
 
-_Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java.util.Collection<io.shardingsphere.shardingui.common.dto.SlaveDataSourceDTO>>`)
+_Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java.util.Collection<io.shardingsphere.shardingui.common.dto.ReplicaDataSourceDTO>>`)
 
 | Parameter            | Field type | Describe                                                          |
 | -------------------- | ---------- | ----------------------------------------------------------------- |
 | success              | Boolean    | Is the request successful                                         |
 | errorCode            | Integer    | Error code                                                        |
 | errorMsg             | String     | Wrong description                                                 |
-| schema               | String     | Schema name of the slave Library                                  |
-| masterDataSourceName | String     | The name of the master library corresponding to the slave Library |
-| slaveDataSourceName  | String     | Name from library                                                 |
-| enabled              | Boolean    | Enable status from library                                        |
+| schema               | String     | Schema name                                  |
+| primaryDataSourceName | String     | The name of primary data source |
+| replicaDataSourceName  | String     | The name of replica data source                                                 |
+| enabled              | Boolean    | Enable status of replica data source                                        |
 
 ```
 {
@@ -618,39 +569,39 @@ _Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java
   "errorMsg": null,
   "model": [
     {
-      "schema": "master_slave_db",
-      "masterDataSourceName": "master_ds",
-      "slaveDataSourceName": "slave_ds_0",
+      "schema": "primary_replica_db",
+      "primaryDataSourceName": "primary_ds",
+      "replicaDataSourceName": "replica_ds_0",
       "enabled": true
     },
     {
-      "schema": "master_slave_db",
-      "masterDataSourceName": "master_ds",
-      "slaveDataSourceName": "slave_ds_1",
+      "schema": "primary_replica_db",
+      "primaryDataSourceName": "primary_ds",
+      "replicaDataSourceName": "replica_ds_1",
       "enabled": true
     }
   ]
 }
 ```
 
-### 7.4 Modify slave status
+### 6.4 Modify replica status
 
-`PUT /api/orchestration/datasource`
+`PUT /api/governance/datasource`
 
 #### Request
 
 | Parameter            | Field type | Essential                                                         | Describe |
 | -------------------- | ---------- | ----------------------------------------------------------------- | -------- |
-| schema               | String     | Schema name of the slave Library                                  |
-| masterDataSourceName | String     | The name of the master library corresponding to the slave Library |
-| slaveDataSourceName  | String     | Name from library                                                 |
-| enabled              | Boolean    | Enable status from library                                        |
+| schema               | String     | Schema name                                  |
+| primaryDataSourceName | String     | The name of primary data source |
+| replicaDataSourceName  | String     | The name of replica data source                                                 |
+| enabled              | Boolean    | Enable status of replica data source                                        |
 
 ```
 {
-  "schema": "master_slave_db",
-  "masterDataSourceName": "master_ds",
-  "slaveDataSourceName": "slave_ds_0",
+  "schema": "primary_replica_db",
+  "primaryDataSourceName": "primary_ds",
+  "replicaDataSourceName": "replica_ds_0",
   "enabled": true
 }
 ```
@@ -667,9 +618,9 @@ _Response Body_: (`io.shardingsphere.shardingui.web.response.ResponseResult<java
 {"success":true,"errorCode":0,"errorMsg":null,"model":null}
 ```
 
-## shardingscaling
+## 7. shardingscaling
 
-### Get sharding scaling service
+### 7.1 Get sharding scaling service
 
 GET /api/shardingscaling
 
@@ -707,7 +658,7 @@ OR
 
 ```
 
-### Add sharding scaling service
+### 7.2 Add sharding scaling service
 
 POST /api/shardingscaling
 
@@ -747,7 +698,7 @@ curl -X POST \
 
 ```
 
-### Delete sharding scaling service
+### 7.3 Delete sharding scaling service
 
 DELETE /api/shardingscaling
 
@@ -772,45 +723,111 @@ curl -X DELETE http://localhost:8088/api/shardingscaling
 
 ```
 
-### Start scaling job
+### 7.4 Start scaling job
 
 POST /api/shardingscaling/job/start
 
 #### Body
 
-| Parameter                                         | Describe                                        |
-| ------------------------------------------------- | ----------------------------------------------- |
-| ruleConfiguration.sourceDatasource                | source sharding proxy data source configuration |
-| ruleConfiguration.sourceRule                      | source sharding proxy table rule configuration  |
-| ruleConfiguration.destinationDataSources.name     | destination sharding proxy name                 |
-| ruleConfiguration.destinationDataSources.url      | destination sharding proxy jdbc url             |
-| ruleConfiguration.destinationDataSources.username | destination sharding proxy username             |
-| ruleConfiguration.destinationDataSources.password | destination sharding proxy password             |
-| jobConfiguration.concurrency                      | sync task proposed concurrency                  |
+| Parameter                                         | Describe                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| ruleConfiguration.source                          | source data source configuration                             |
+| ruleConfiguration.target                          | target data source configuration                             |
+| jobConfiguration.concurrency                      | sync task proposed concurrency                               |
+
+Data source configuration:
+
+| Parameter                                         | Describe                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| type                                              | data source type(available parameters:shardingSphereJdbc,jdbc)|
+| parameter                                         | data source parameter                                        |
+
+Parameter configuration:
+
+type = shardingSphereJdbc 
+
+| Parameter                                         | Describe                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| dataSource                                        | sharding sphere data source configuration                    |
+| rule                                              | sharding sphere data source table rule                       |
+
+type = jdbc 
+
+| Parameter                                         | Describe                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------ |
+| name                                              | jdbc name                                                    |
+| ruleConfiguration.targetDataSources.jdbcUrl           | jdbc url                                                     |
+| ruleConfiguration.targetDataSources.username      | jdbc username                                                |
+| ruleConfiguration.targetDataSources.password      | jdbc password                                                |
 
 #### Example
 
 ```
-
 curl -X POST \
- http://localhost:8088/api/shardingscaling/job/start \
- -H 'content-type: application/json' \
- -d '{
-"ruleConfiguration": {
-"sourceDatasource": "ds*0: !!YamlDataSourceConfiguration\n dataSourceClassName: com.zaxxer.hikari.HikariDataSource\n props:\n jdbcUrl: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=UTC&useSSL=false\n username: root\n password: '\''123456'\''\n connectionTimeout: 30000\n idleTimeout: 60000\n maxLifetime: 1800000\n maxPoolSize: 50\n minPoolSize: 1\n maintenanceIntervalMilliseconds: 30000\n readOnly: false\n",
-"sourceRule": "defaultDatabaseStrategy:\n inline:\n algorithmExpression: ds*\${user_id % 2}\n shardingColumn: user_id\ntables:\n t1:\n actualDataNodes: ds_0.t1\n keyGenerateStrategy:\n column: order_id\n type: SNOWFLAKE\n logicTable: t1\n tableStrategy:\n inline:\n algorithmExpression: t1\n shardingColumn: order_id\n t2:\n actualDataNodes: ds_0.t2\n keyGenerateStrategy:\n column: order_item_id\n type: SNOWFLAKE\n logicTable: t2\n tableStrategy:\n inline:\n algorithmExpression: t2\n shardingColumn: order_id\n",
-"destinationDataSources": {
-"name": "dt_0",
-"password": "123456",
-"url": "jdbc:mysql://127.0.0.1:3306/test2?serverTimezone=UTC&useSSL=false",
-"username": "root"
-}
-},
-"jobConfiguration": {
-"concurrency": 3
-}
-}'
-
+  http://localhost:8088/api/shardingscaling/job/start \
+  -H 'content-type: application/json' \
+  -d '{
+        "ruleConfiguration": {
+          "source": {
+            "type": "shardingSphereJdbc",
+            "parameter": {
+              "dataSource":"
+                dataSources:
+                  ds_0:
+                    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+                    props:
+                      driverClassName: com.mysql.jdbc.Driver
+                      jdbcUrl: jdbc:mysql://127.0.0.1:3306/scaling_0?useSSL=false
+                      username: scaling
+                      password: scaling
+                  ds_1:
+                    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+                    props:
+                      driverClassName: com.mysql.jdbc.Driver
+                      jdbcUrl: jdbc:mysql://127.0.0.1:3306/scaling_1?useSSL=false
+                      username: scaling
+                      password: scaling
+                ",
+              "rule":"
+                rules:
+                - !SHARDING
+                  tables:
+                    t_order:
+                      actualDataNodes: ds_$->{0..1}.t_order_$->{0..1}
+                      databaseStrategy:
+                        standard:
+                          shardingColumn: order_id
+                          shardingAlgorithmName: t_order_db_algorith
+                      logicTable: t_order
+                      tableStrategy:
+                        standard:
+                          shardingColumn: user_id
+                          shardingAlgorithmName: t_order_tbl_algorith
+                  shardingAlgorithms:
+                    t_order_db_algorith:
+                      type: INLINE
+                      props:
+                        algorithm-expression: ds_$->{order_id % 2}
+                    t_order_tbl_algorith:
+                      type: INLINE
+                      props:
+                        algorithm-expression: t_order_$->{user_id % 2}
+                "
+            }
+          },
+          "target": {
+              "type": "jdbc",
+              "parameter": {
+                "username": "root",
+                "password": "root",
+                "jdbcUrl": "jdbc:mysql://127.0.0.1:3307/sharding_db?serverTimezone=UTC&useSSL=false"
+              }
+          }
+        },
+        "jobConfiguration":{
+          "concurrency":"3"
+        }
+      }'
 ```
 
 #### Response
@@ -826,7 +843,7 @@ curl -X POST \
 
 ```
 
-### Get scaling progress
+### 7.5 Get scaling progress
 
 GET /api/shardingscaling/job/progress/{jobId}
 
@@ -894,7 +911,7 @@ curl -X GET \
 
 ```
 
-### List scaling jobs
+### 7.6 List scaling jobs
 
 GET /api/shardingscaling/job/list
 
@@ -925,9 +942,9 @@ curl -X GET \
 
 ```
 
-### Stop scaling job
+### 7.7 Stop scaling job
 
-POST /api/shardingscaling/job/stop
+GET /api/shardingscaling/job/stop
 
 #### Body
 
@@ -938,14 +955,8 @@ POST /api/shardingscaling/job/stop
 #### Example
 
 ```
-
-curl -X POST \
- http://localhost:8088/api/shardingscaling/job/stop \
- -H 'content-type: application/json' \
- -d '{
-"jobId":1
-}'
-
+curl -X GET \
+  http://localhost:8888/scaling/job/stop/1
 ```
 
 #### Response

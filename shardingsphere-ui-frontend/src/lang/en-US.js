@@ -20,24 +20,15 @@ export default {
     home: 'Home',
     menuData: [
       {
-        title: 'Config Center',
+        title: 'Governance',
         child: [
           {
-            title: 'Config Server',
-            href: '/config-center'
+            title: 'Registry Center',
+            href: '/registry-center'
           },
           {
             title: 'Rule Config',
             href: '/rule-config'
-          }
-        ]
-      },
-      {
-        title: 'Registry Center',
-        child: [
-          {
-            title: 'Registry Server',
-            href: '/registry-center'
           },
           {
             title: 'Runtime Status',
@@ -48,10 +39,6 @@ export default {
       {
         title: 'Data scaling',
         href: '/data-scaling'
-      },
-      {
-        title: 'Cluster state',
-        href: '/cluster-state'
       }
     ],
     connected: 'Connected',
@@ -69,6 +56,7 @@ export default {
       updateFaildMessage: 'Update Faild',
       confirmDelOperator: 'Confirm delete'
     },
+    currentRegistryCenter: 'Connected Registry Center',
     loginOut: 'Sign Out',
     dropdownList: [
       {
@@ -102,72 +90,44 @@ export default {
       title: 'Add a registry center',
       editTitle: 'Edit registry center',
       name: 'Name',
-      centerType: 'Instance Type',
+      centerType: 'Type',
       address: 'Address',
-      orchestrationName: 'Orchestration Name',
+      governanceName: 'Governance Name',
       namespaces: 'Namespace',
       digest: 'Digest',
       btnConfirmTxt: 'Confirm',
       btnCancelTxt: 'Cancel'
     },
     table: {
-      operate: 'Operate',
+      operate: 'Operation',
       operateConnect: 'Connect',
       operateConnected: 'Connected',
-      operateDel: 'Del',
+      operateDel: 'Delete',
       operateEdit: 'Edit'
     },
     rules: {
       name: 'Please enter the name of the registration center',
-      address: 'Please enter the registration center Address',
-      namespaces: 'Please enter a Namespace',
-      centerType: 'Please select a Center Type',
-      orchestrationName: 'Please enter a Orchestration Name',
-      digest: 'Please enter a digest'
-    }
-  },
-  configCenter: {
-    btnTxt: 'ADD',
-    configDialog: {
-      title: 'Add a config center',
-      editTitle: 'Edit config center',
-      name: 'Name',
-      centerType: 'Instance Type',
-      address: 'Address',
-      orchestrationName: 'Orchestration Name',
-      namespaces: 'Namespace',
-      digest: 'Digest',
-      btnConfirmTxt: 'Confirm',
-      btnCancelTxt: 'Cancel'
-    },
-    table: {
-      operate: 'Operate',
-      operateConnect: 'Connect',
-      operateConnected: 'Connected',
-      operateDel: 'Del',
-      operateEdit: 'Edit'
-    },
-    rules: {
-      name: 'Please enter the name of the config center',
-      address: 'Please enter the config center Address',
-      namespaces: 'Please enter a Namespace',
-      centerType: 'Please select a Center Type',
-      orchestrationName: 'Please enter a Orchestration Name',
+      address: 'Please enter the registration center address',
+      additionalAddress: 'Please enter additional config center address',
+      namespaces: 'Please enter a namespace',
+      centerType: 'Please select a center type',
+      governanceName: 'Please enter a governance name',
       digest: 'Please enter a digest'
     }
   },
   runtimeStatus: {
     serviceNode: 'Service Node',
-    slaveDataSourceName: 'Slave DataSource Info',
+    replicaDataSourceName: 'Replica DataSource Info',
     dataSource: {
       schema: 'Schema',
-      masterDataSourceName: 'Master DataSource Name',
-      slaveDataSourceName: 'Slave DataSource Name'
+      masterDataSourceName: 'Primary DataSource Name',
+      replicaDataSourceName: 'Replica DataSource Name'
     },
     instance: {
       instanceId: 'Instance Id',
       serverIp: 'Server Ip'
-    }
+    },
+    enabled: 'Enabled'
   },
   ruleConfig: {
     form: {
@@ -195,10 +155,10 @@ export default {
   dataScaling: {
     btnTxt: 'ADD',
     tableList: {
-      jobId: 'jobId',
-      jobName: 'jobName',
-      status: 'status',
-      operate: 'operate',
+      jobId: 'Job Id',
+      jobName: 'Job Name',
+      status: 'Status',
+      operate: 'Operation',
       operateStop: 'stop',
       operateSee: 'see'
     },
@@ -235,17 +195,15 @@ export default {
       serviceUrl: 'Service Url',
       serviceNamePlaceholder: 'Please enter serviceName',
       serviceUrlPlaceholder: 'Please enter serviceUrl'
-    }
-  },
-  clusterState: {
-    legendLabel: {
-      onLine: 'ONLINE',
-      offLine: 'OFFLINE',
-      disabled: 'DISABLED',
-      unknown: 'UNKNOWN'
     },
-    configBar: {
-      refreshPeriodLabel: 'Auto Refresh'
+    detail: {
+      inventory: 'Inventory',
+      increment: 'Increment',
+      taskId: 'Sub Task Id',
+      shardingItem: 'Sharding Item',
+      delay: 'Delay(seconds)',
+      total: 'Total Tasks',
+      finished: 'Finished Tasks'
     }
   }
 }

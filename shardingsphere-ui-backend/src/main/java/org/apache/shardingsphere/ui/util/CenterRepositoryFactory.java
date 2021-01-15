@@ -17,13 +17,15 @@
 
 package org.apache.shardingsphere.ui.util;
 
+import com.google.common.base.Strings;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.shardingsphere.orchestration.center.ConfigCenterRepository;
-import org.apache.shardingsphere.orchestration.center.RegistryCenterRepository;
-import org.apache.shardingsphere.orchestration.center.config.CenterConfiguration;
-import org.apache.shardingsphere.orchestration.center.instance.CuratorZookeeperCenterRepository;
-import org.apache.shardingsphere.orchestration.center.instance.EtcdCenterRepository;
+import org.apache.shardingsphere.governance.repository.api.ConfigurationRepository;
+import org.apache.shardingsphere.governance.repository.api.GovernanceRepository;
+import org.apache.shardingsphere.governance.repository.api.RegistryRepository;
+import org.apache.shardingsphere.governance.repository.api.config.GovernanceCenterConfiguration;
+import org.apache.shardingsphere.governance.repository.etcd.EtcdRepository;
+import org.apache.shardingsphere.governance.repository.zookeeper.CuratorZookeeperRepository;
 import org.apache.shardingsphere.ui.common.constant.InstanceType;
 import org.apache.shardingsphere.ui.common.domain.CenterConfig;
 
@@ -36,74 +38,75 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CenterRepositoryFactory {
     
-    private static final ConcurrentHashMap<String, RegistryCenterRepository> REGISTRY_CENTER_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, RegistryRepository> REGISTRY_REPOSITORY_MAP = new ConcurrentHashMap<>();
     
-    private static final ConcurrentHashMap<String, ConfigCenterRepository> CONFIG_CENTER_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ConfigurationRepository> CONFIG_REPOSITORY_MAP = new ConcurrentHashMap<>();
     
     /**
-     * Create registry center instance.
+     * Create registry repository.
      *
-     * @param config registry center config
-     * @return registry center
+     * @param config center config
+     * @return registry repository
      */
-    public static RegistryCenterRepository createRegistryCenter(final CenterConfig config) {
-        RegistryCenterRepository result = REGISTRY_CENTER_MAP.get(config.getName());
+    public static RegistryRepository createRegistryRepository(final CenterConfig config) {
+        RegistryRepository result = REGISTRY_REPOSITORY_MAP.get(config.getName());
         if (null != result) {
             return result;
         }
-        InstanceType instanceType = InstanceType.nameOf(config.getInstanceType());
-        switch (instanceType) {
-            case ZOOKEEPER:
-                result = new CuratorZookeeperCenterRepository();
-                break;
-            case ETCD:
-                EtcdCenterRepository etcdCenterRepository = new EtcdCenterRepository();
-                etcdCenterRepository.setProps(new Properties());
-                result = etcdCenterRepository;
-                break;
-            default:
-                throw new UnsupportedOperationException(config.getName());
-        }
-        result.init(convert(config));
-        REGISTRY_CENTER_MAP.put(config.getName(), result);
+        result = (RegistryRepository) createGovernanceRepository(config.getInstanceType());
+        result.init(config.getGovernanceName(), convert(config));
+        REGISTRY_REPOSITORY_MAP.put(config.getName(), result);
         return result;
     }
     
     /**
-     * Create config center instance.
+     * Create configuration repository.
      * 
-     * @param config config center config
-     * @return config center
+     * @param config center config
+     * @return configuration repository
      */
-    public static ConfigCenterRepository createConfigCenter(final CenterConfig config) {
-        ConfigCenterRepository result = CONFIG_CENTER_MAP.get(config.getName());
+    public static ConfigurationRepository createConfigurationRepository(final CenterConfig config) {
+        ConfigurationRepository result = CONFIG_REPOSITORY_MAP.get(config.getName());
         if (null != result) {
             return result;
         }
-        InstanceType instanceType = InstanceType.nameOf(config.getInstanceType());
-        switch (instanceType) {
-            case ZOOKEEPER:
-                result = new CuratorZookeeperCenterRepository();
-                break;
-            case ETCD:
-                EtcdCenterRepository etcdCenterRepository = new EtcdCenterRepository();
-                etcdCenterRepository.setProps(new Properties());
-                result = etcdCenterRepository;
-                break;
-            default:
-                throw new UnsupportedOperationException(config.getName());
+        if (!Strings.isNullOrEmpty(config.getAdditionalConfigCenterServerList())
+                && !Strings.isNullOrEmpty(config.getAdditionalConfigCenterType())) {
+            result = (ConfigurationRepository) createGovernanceRepository(config.getAdditionalConfigCenterType());
+        } else {
+            RegistryRepository registryRepository = (RegistryRepository) createGovernanceRepository(config.getInstanceType());
+            if (registryRepository instanceof  ConfigurationRepository) {
+                result = (ConfigurationRepository) registryRepository;
+            } else {
+                throw new IllegalArgumentException("Registry repository is not suitable for config center and no additional config center configuration provided.");
+            }
         }
-        result.init(convert(config));
-        CONFIG_CENTER_MAP.put(config.getName(), result);
+        result.init(config.getGovernanceName(), convert(config));
+        CONFIG_REPOSITORY_MAP.put(config.getName(), result);
         return result;
     }
     
-    private static CenterConfiguration convert(final CenterConfig config) {
-        CenterConfiguration result = new CenterConfiguration(config.getInstanceType(), new Properties());
-        result.setServerLists(config.getServerLists());
-        result.setNamespace(config.getNamespace());
+    private static GovernanceCenterConfiguration convert(final CenterConfig config) {
+        GovernanceCenterConfiguration result = new GovernanceCenterConfiguration(config.getInstanceType(), config.getServerLists(), new Properties());
         result.getProps().put("digest", config.getDigest());
         return result;
     }
     
+    private static GovernanceRepository createGovernanceRepository(final String instanceType) {
+        RegistryRepository result;
+        InstanceType type = InstanceType.nameOf(instanceType);
+        switch (type) {
+            case ZOOKEEPER:
+                result = new CuratorZookeeperRepository();
+                break;
+            case ETCD:
+                EtcdRepository etcdCenterRepository = new EtcdRepository();
+                etcdCenterRepository.setProps(new Properties());
+                result = etcdCenterRepository;
+                break;
+            default:
+                throw new UnsupportedOperationException(instanceType);
+        }
+        return result;
+    }
 }

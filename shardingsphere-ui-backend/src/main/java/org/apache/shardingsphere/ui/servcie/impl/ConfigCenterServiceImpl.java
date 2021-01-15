@@ -17,9 +17,8 @@
 
 package org.apache.shardingsphere.ui.servcie.impl;
 
-import org.apache.shardingsphere.orchestration.center.ConfigCenterRepository;
-import org.apache.shardingsphere.orchestration.core.configcenter.ConfigCenterNode;
-import org.apache.shardingsphere.ui.common.constant.OrchestrationType;
+import org.apache.shardingsphere.governance.core.config.ConfigCenterNode;
+import org.apache.shardingsphere.governance.repository.api.ConfigurationRepository;
 import org.apache.shardingsphere.ui.common.domain.CenterConfig;
 import org.apache.shardingsphere.ui.common.exception.ShardingSphereUIException;
 import org.apache.shardingsphere.ui.servcie.CenterConfigService;
@@ -40,19 +39,19 @@ public final class ConfigCenterServiceImpl implements ConfigCenterService {
     private CenterConfigService centerConfigService;
     
     @Override
-    public ConfigCenterRepository getActivatedConfigCenter() {
-        Optional<CenterConfig> optional = centerConfigService.loadActivated(OrchestrationType.CONFIG_CENTER.getValue());
+    public ConfigurationRepository getActivatedConfigCenter() {
+        Optional<CenterConfig> optional = centerConfigService.loadActivated();
         if (optional.isPresent()) {
-            return CenterRepositoryFactory.createConfigCenter(optional.get());
+            return CenterRepositoryFactory.createConfigurationRepository(optional.get());
         }
         throw new ShardingSphereUIException(ShardingSphereUIException.SERVER_ERROR, "No activated config center!");
     }
     
     @Override
     public ConfigCenterNode getActivateConfigurationNode() {
-        Optional<CenterConfig> optional = centerConfigService.loadActivated(OrchestrationType.CONFIG_CENTER.getValue());
+        Optional<CenterConfig> optional = centerConfigService.loadActivated();
         if (optional.isPresent()) {
-            return new ConfigCenterNode(optional.get().getOrchestrationName());
+            return new ConfigCenterNode();
         }
         throw new ShardingSphereUIException(ShardingSphereUIException.SERVER_ERROR, "No activated config center!");
     }

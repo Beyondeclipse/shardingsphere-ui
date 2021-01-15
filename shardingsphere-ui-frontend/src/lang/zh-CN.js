@@ -20,24 +20,15 @@ export default {
     home: '主页',
     menuData: [
       {
-        title: '配置中心',
+        title: '分布式治理',
         child: [
           {
-            title: '服务列表',
-            href: '/config-center'
+            title: '注册中心',
+            href: '/registry-center'
           },
           {
             title: '配置管理',
             href: '/rule-config'
-          }
-        ]
-      },
-      {
-        title: '注册中心',
-        child: [
-          {
-            title: '服务列表',
-            href: '/registry-center'
           },
           {
             title: '运行状态',
@@ -48,10 +39,6 @@ export default {
       {
         title: '数据扩容',
         href: '/data-scaling'
-      },
-      {
-        title: '节点状态',
-        href: '/cluster-state'
       }
     ],
     connect: '已连接',
@@ -69,6 +56,7 @@ export default {
       updateFaildMessage: '更新失败',
       confirmDelOperator: '确认删除'
     },
+    currentRegistryCenter: '已连接注册中心',
     loginOut: '退出登录',
     dropdownList: [
       {
@@ -104,7 +92,7 @@ export default {
       name: '注册中心名称',
       centerType: '注册中心类型',
       address: '注册中心地址',
-      orchestrationName: '数据治理实例',
+      governanceName: '治理实例名称',
       namespaces: '命名空间',
       digest: '登录凭证',
       btnConfirmTxt: '确定',
@@ -122,52 +110,24 @@ export default {
       centerType: '请选择注册中心类型',
       namespaces: '请输入命名空间',
       address: '请输入注册中心地址',
-      orchestrationName: '请输入数据治理实例名称',
-      digest: '请输入登录凭证'
-    }
-  },
-  configCenter: {
-    btnTxt: '添加',
-    configDialog: {
-      title: '添加配置中心',
-      editTitle: '编辑配置中心',
-      name: '配置中心名称',
-      centerType: '配置中心类型',
-      address: '配置中心地址',
-      orchestrationName: '数据治理实例',
-      namespaces: '命名空间',
-      digest: '登录凭证',
-      btnConfirmTxt: '确定',
-      btnCancelTxt: '取消'
-    },
-    table: {
-      operate: '操作',
-      operateConnect: '连接',
-      operateConnected: '已激活',
-      operateDel: '删除',
-      operateEdit: '编辑'
-    },
-    rules: {
-      name: '请输入配置中心名称',
-      centerType: '请选择配置中心类型',
-      namespaces: '请输入命名空间',
-      address: '请输入配置中心地址',
-      orchestrationName: '请输入数据治理实例名称',
+      additionalAddress: '请输入扩展配置中心地址',
+      governanceName: '请输入治理实例名称',
       digest: '请输入登录凭证'
     }
   },
   runtimeStatus: {
     serviceNode: '服务节点',
-    slaveDataSourceName: '从库信息',
+    replicaDataSourceName: '从库信息',
     dataSource: {
       schema: '逻辑库名',
       masterDataSourceName: '主库名',
-      slaveDataSourceName: '从库名'
+      replicaDataSourceName: '从库名'
     },
     instance: {
       instanceId: '节点标识',
       serverIp: '服务ip'
-    }
+    },
+    enabled: '是否启用'
   },
   ruleConfig: {
     form: {
@@ -233,17 +193,15 @@ export default {
       serviceUrl: '服务地址',
       serviceNamePlaceholder: '请输入服务名称',
       serviceUrlPlaceholder: '请输入服务地址'
-    }
-  },
-  clusterState: {
-    legendLabel: {
-      onLine: '正常',
-      offLine: '下线',
-      disabled: '禁用',
-      unknown: '未知'
     },
-    configBar: {
-      refreshPeriodLabel: '定时刷新'
+    detail: {
+      inventory: '存量',
+      increment: '增量',
+      taskId: '子任务Id',
+      shardingItem: '分片项',
+      delay: '延迟(秒)',
+      total: '总任务数',
+      finished: '已完成任务数'
     }
   }
 }

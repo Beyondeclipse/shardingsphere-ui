@@ -5,11 +5,11 @@
 [![Build Status](https://builds.apache.org/job/shardingsphere-ui-dev/badge/icon)](https://builds.apache.org/job/shardingsphere-ui-dev/)
 ## Overview
 
-ShardingSphere UI is a management background for [ShardingSphere](https://shardingsphere.apache.org/), including: dynamic configuration, Data orchestration, etc.
+ShardingSphere UI is a management background for [ShardingSphere](https://shardingsphere.apache.org/), including: dynamic configuration, Data governance, etc.
 
 ### ShardingSphere UI Frontend
 
-shardingsphere-ui-frontend based on [vue](https://github.com/vuejs/vue) and use the UI Toolkit [element](https://github.com/ElemeFE/element).
+shardingsphere-ui-frontend based on [Vue.js](https://github.com/vuejs/vue) and use the UI Toolkit [element](https://github.com/ElemeFE/element).
 
 * [shardingsphere-ui-frontend/README.md](shardingsphere-ui-frontend/README.md)
 

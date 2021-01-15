@@ -53,7 +53,7 @@
                 size="small"
                 type="primary"
                 icon="el-icon-view"
-                @click="handlerView(scope.row)"
+                @click="showSyncTaskProgressDetail(scope.row)"
               />
             </el-tooltip>
             <el-tooltip
@@ -188,141 +188,41 @@
         </el-col>
       </el-row>
     </el-dialog>
-    <!-- syncTaskProgress -->
-    <el-dialog
-      :visible.sync="DataScalingDialogProgressVisible"
-      width="1010px"
-      @close="close()"
-    >
-      <el-form :inline="true">
-        <el-form-item label="JobID">
-          {{ progressRow.id }}
-        </el-form-item>
-        <el-form-item label="JobName">
-          {{ progressRow.jobName }}
-        </el-form-item>
-        <el-form-item label="Status">
-          {{ progressRow.status }}
-        </el-form-item>
-      </el-form>
-      <el-row :gutter="12">
-        <el-col
-          v-for="(item, index) in progressRow.syncTaskProgress"
-          :span="6"
-          :key="index"
-        >
-          <el-card shadow="hover">
-            <el-form :inline="true">
-              <el-form-item label="scalingTask">
-                {{ item.id }}
-              </el-form-item>
-              <el-form-item label="syncStatus">
-                {{ item.status }}
-              </el-form-item>
-              <el-form-item>
-                <el-button
-                  size="mini"
-                  type="primary"
-                  icon="el-icon-thumb"
-                  @click="showSyncTaskProgressDetail(item)"
-                ></el-button>
-              </el-form-item>
-            </el-form>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-dialog>
     <!-- syncTaskProgressDetail -->
     <el-dialog
       :visible.sync="DataScalingDialogSyncTaskProgressDetailVisible"
-      width="1010px"
+      width="1110px"
     >
       <el-form :inline="true">
-        <el-form-item label="JobID">
-          {{ syncTaskProgress.id }}
+        <el-form-item :label="this.$t('dataScaling').tableList.jobId">
+          {{ job.jobId }}
         </el-form-item>
-        <el-form-item label="Status">
-          {{ syncTaskProgress.status }}
+        <el-form-item :label="this.$t('dataScaling').tableList.jobName">
+          {{ job.jobName }}
+        </el-form-item>
+        <el-form-item :label="this.$t('dataScaling').tableList.status">
+          {{ job.status }}
         </el-form-item>
       </el-form>
-      <div class="progress-list">
-        <el-row class="progress-item">
-          <el-col :span="2">
-            <el-button
-              size="mini"
-              type="success"
-              icon="el-icon-check"
-              circle
-            ></el-button>
-          </el-col>
-          <el-col :span="2"><div style="color: #333; font-weight: 500;">Preparing</div></el-col>
-          <el-col :span="6" class="collapse-progress collapse-active">
-            <el-progress
-              :stroke-width="10"
-              :percentage="100"
-              :show-text="false"
-            ></el-progress>
-          </el-col>
-        </el-row>
-      </div>
-      <el-collapse>
-        <el-collapse-item>
-          <template slot="title">
-            <el-row class="collapse-row progress-item">
-              <el-col :span="2">
-                <el-button
-                  size="mini"
-                  type="success"
-                  icon="el-icon-check"
-                  circle
-                ></el-button>
-              </el-col>
-              <el-col :span="2"><div>History</div></el-col>
-              <el-col :span="6" class="collapse-progress">
-                <el-progress :stroke-width="10" :percentage="percentageComputed"></el-progress>
-              </el-col>
-            </el-row>
-          </template>
-          <el-row :gutter="12">
-            <el-col
-              v-for="(item, index) in syncTaskProgress.historySyncTaskProgress"
-              :span="8"
-              :key="index"
-            >
-              <el-card shadow="hover" style="margin-bottom: 10px">
-                {{ item.id }}
-                <v-chart :options="getOption(item)" />
-              </el-card>
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-        <el-collapse-item>
-          <template slot="title">
-            <el-row class="collapse-row">
-              <el-col :span="2">
-                <el-button
-                  size="mini"
-                  type="success"
-                  icon="el-icon-check"
-                  circle
-                ></el-button>
-              </el-col>
-              <el-col :span="2"><div>Realtime</div></el-col>
-            </el-row>
-          </template>
-          <el-row class="progress-item">
-            <el-col :span="10">
-              <span style="color: #333; font-weight: 500;">delayMillisecond:</span>
-              {{
-                this.$moment(
-                  syncTaskProgress.realTimeSyncTaskProgress &&
-                    syncTaskProgress.realTimeSyncTaskProgress.delayMillisecond
-                ).format('s')
-              }}s
-            </el-col>
-          </el-row>
-        </el-collapse-item>
-      </el-collapse>
+
+      <el-tabs v-model="activeName">
+        <el-tab-pane name="first">
+          <div slot="label">{{ this.$t('dataScaling').detail.inventory }} ({{ percentageComputed }}%)</div>
+          <el-table :data="jobDetail.inventoryTaskProgress">
+            <el-table-column :label="this.$t('dataScaling').detail.shardingItem" prop="shardingItem"></el-table-column>
+            <el-table-column :label="this.$t('dataScaling').detail.total" prop="total"></el-table-column>
+            <el-table-column :label="this.$t('dataScaling').detail.finished" prop="finished"></el-table-column>
+          </el-table>
+        </el-tab-pane>
+        <el-tab-pane :label="this.$t('dataScaling').detail.increment" name="second">
+          <el-table :data="jobDetail.incrementalTaskProgress">
+            <el-table-column :label="this.$t('dataScaling').detail.shardingItem" prop="shardingItem"></el-table-column>
+            <el-table-column :label="this.$t('dataScaling').detail.taskId" prop="id"></el-table-column>
+            <el-table-column :label="this.$t('dataScaling').detail.delay" prop="delayMillisecond"></el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
+
     </el-dialog>
     <el-dialog
       :visible.sync="serverDialogVisible"
@@ -334,11 +234,11 @@
       center>
       <el-form label-width="110px">
         <el-form-item
-        :label="$t('dataScaling.serviceDialog.serviceName')">
+          :label="$t('dataScaling.serviceDialog.serviceName')">
           <el-input v-model="serviceForm.serviceName" :placeholder="$t('dataScaling.serviceDialog.serviceNamePlaceholder')"/>
         </el-form-item>
         <el-form-item
-        :label="$t('dataScaling.serviceDialog.serviceUrl')">
+          :label="$t('dataScaling.serviceDialog.serviceUrl')">
           <el-input v-model="serviceForm.serviceUrl" :placeholder="$t('dataScaling.serviceDialog.serviceUrlPlaceholder')"/>
         </el-form-item>
         <el-form-item>
@@ -356,11 +256,8 @@
 <script>
 import yaml from 'js-yaml'
 import Vue from 'vue'
-import ChartBase from '@/components/ChartBase'
 import moment from 'moment'
 import clone from 'lodash/clone'
-import isEmpty from 'lodash/isEmpty'
-import 'echarts-liquidfill'
 import API from '../api'
 
 Vue.prototype.$moment = moment
@@ -395,13 +292,9 @@ let timer = null
 
 export default {
   name: 'DataScalingIndex',
-  components: {
-    'v-chart': ChartBase
-  },
   data() {
     return {
       DataScalingDialogVisible: false,
-      DataScalingDialogProgressVisible: false,
       DataScalingDialogSyncTaskProgressDetailVisible: false,
       DatasourceVisible: false,
       serverDialogVisible: false,
@@ -437,8 +330,9 @@ export default {
         url: '',
         jobCount: '3'
       },
-      progressRow: {},
-      syncTaskProgress: {},
+      job: {},
+      jobDetail: {},
+      activeName: 'first',
       rules: {
         source: [
           {
@@ -492,16 +386,7 @@ export default {
   },
   computed: {
     textareaDatasourceCom() {
-      const dsYamlType = new yaml.Type(
-        'tag:yaml.org,2002:org.apache.shardingsphere.orchestration.core.configuration.YamlDataSourceConfiguration',
-        {
-          kind: 'mapping',
-          construct(data) {
-            return data !== null ? data : {}
-          }
-        }
-      )
-      const DS_SCHEMA = yaml.Schema.create(dsYamlType)
+      const DS_SCHEMA = yaml.Schema.create([])
       return JSON.stringify(
         yaml.load(this.textareaDatasource, { schema: DS_SCHEMA }),
         null,
@@ -509,15 +394,6 @@ export default {
       )
     },
     textareaRuleCom() {
-      const dsYamlType = new yaml.Type(
-        'tag:yaml.org,2002:org.apache.shardingsphere.orchestration.core.configuration.YamlDataSourceConfiguration',
-        {
-          kind: 'mapping',
-          construct(data) {
-            return data !== null ? data : {}
-          }
-        }
-      )
       const shardingYamlType = new yaml.Type(
         '!SHARDING',
         {
@@ -537,7 +413,7 @@ export default {
         }
       )
       const masterSlaveYamlType = new yaml.Type(
-        '!MASTER_SLAVE',
+        '!PRIMARY_REPLICA_REPLICATION',
         {
           kind: 'mapping',
           construct(data) {
@@ -554,7 +430,7 @@ export default {
           }
         }
       )
-      const DS_SCHEMA = yaml.Schema.create([dsYamlType, shardingYamlType, encryptYamlType, masterSlaveYamlType, shadowYamlType])
+      const DS_SCHEMA = yaml.Schema.create([shardingYamlType, encryptYamlType, masterSlaveYamlType, shadowYamlType])
       return JSON.stringify(
         yaml.load(this.textareaRule, { schema: DS_SCHEMA }),
         null,
@@ -562,25 +438,30 @@ export default {
       )
     },
     percentageComputed() {
-      const arr = this.syncTaskProgress.historySyncTaskProgress
-      if (!arr) return
-      let sumEstimatedRows = 0
-      let sumSyncedRows = 0
-      for (const v of arr) {
-        sumEstimatedRows += v.estimatedRows
-        sumSyncedRows += v.syncedRows
+      if (!this.jobDetail.inventoryTaskProgress) {
+        return
       }
-      let res = 0
-      if (sumEstimatedRows) {
-        res = sumSyncedRows / sumEstimatedRows
+      let total = 0
+      let finished = 0
+      for (const v of this.jobDetail.inventoryTaskProgress) {
+        total += v.total
+        finished += v.finished
       }
-      return nDecimal(res * 100, 0)
+      return total ? nDecimal(finished / total * 100, 0) : 100
     }
   },
   created() {
     this.getJobServer()
   },
   methods: {
+    dateFormat(row, column) {
+      if (row.delayMillisecond === -1) {
+        return -1
+      }
+      return this.$moment(
+        row.delayMillisecond
+      ).format('s')
+    },
     showServerDialog() {
       this.serverDialogVisible = true
     },
@@ -626,20 +507,6 @@ export default {
         this.serverDialogVisible = true
       })
     },
-    getPercentage(arr) {
-      if (!arr) return
-      let sumEstimatedRows = ''
-      let sumSyncedRows = ''
-      for (const v of arr) {
-        sumEstimatedRows += v.estimatedRows
-        sumSyncedRows += v.syncedRows
-      }
-      let res = 0
-      if (sumEstimatedRows) {
-        res = sumSyncedRows / sumEstimatedRows
-      }
-      return nDecimal(res, 2) * 100
-    },
     getOption(obj) {
       let data = 0
       if (obj.estimatedRows) {
@@ -665,7 +532,6 @@ export default {
     selectChange(item) {
       this.getSchemaDataSource(item)
       this.getSchemaRule(item)
-      this.getSchemaMetadata(item)
     },
     getSchemaDataSource(schemaName) {
       API.getSchemaDataSource(schemaName).then(res => {
@@ -687,16 +553,6 @@ export default {
         }
       })
     },
-    getSchemaMetadata(schemaName) {
-      API.getSchemaMetadata(schemaName).then(res => {
-        const { model } = res
-        if (Object.prototype.toString.call(model) === '[object String]') {
-          this.textareaRule = model
-        } else {
-          this.textareaRule = JSON.stringify(model, null, '\t')
-        }
-      })
-    },
     getSchema() {
       API.getSchema().then(res => {
         this.schemaData = res.model
@@ -704,7 +560,7 @@ export default {
     },
     handleCurrentChange(val) {
       const data = clone(this.cloneTableData)
-      this.tableData = data.splice(val - 1, this.pageSize)
+      this.tableData = data.splice((val - 1) * this.pageSize, this.pageSize)
     },
     getJobList() {
       API.getJobList().then(res => {
@@ -715,10 +571,7 @@ export default {
       })
     },
     handlerStop(row) {
-      const params = {
-        jobId: row.jobId
-      }
-      API.postJobStop(params).then(res => {
+      API.getJobStop(row.jobId).then(res => {
         this.$notify({
           title: this.$t('dataScaling').notify.title,
           message: this.$t('dataScaling').notify.delSucMessage,
@@ -731,14 +584,7 @@ export default {
       const { jobId, status } = row
       API.getJobProgress(jobId).then(res => {
         const { model } = res
-        this.progressRow = model
-        if (!isEmpty(this.syncTaskProgress)) {
-          for (const v of model.syncTaskProgress) {
-            if (v.id === this.syncTaskProgress.id) {
-              this.syncTaskProgress = v
-            }
-          }
-        }
+        this.jobDetail = model
         clearTimeout(timer)
         if (status !== 'STOPPED') {
           timer = setTimeout(() => {
@@ -748,13 +594,10 @@ export default {
         }
       })
     },
-    handlerView(row) {
-      this.DataScalingDialogProgressVisible = true
-      this.getJobProgress(row)
-    },
     showSyncTaskProgressDetail(item) {
+      this.job = item
       this.DataScalingDialogSyncTaskProgressDetailVisible = true
-      this.syncTaskProgress = item
+      this.getJobProgress(item)
     },
     onConfirm(formName) {
       this.$refs[formName].validate(valid => {
@@ -762,15 +605,20 @@ export default {
           const { username, password, url, jobCount } = this.form
           const params = {
             ruleConfiguration: {
-              sourceDatasource: this.textareaDatasource,
-              sourceRule: this.textareaRule,
-              // sourceDatasource: "ds_0: !!YamlDataSourceConfiguration\n  dataSourceClassName: com.zaxxer.hikari.HikariDataSource\n  props:\n    jdbcUrl: jdbc:mysql://sharding-scaling-mysql:3306/test?serverTimezone=UTC&useSSL=false\n    username: root\n    password: '123456'\n    connectionTimeout: 30000\n    idleTimeout: 60000\n    maxLifetime: 1800000\n    maxPoolSize: 50\n    minPoolSize: 1\n    maintenanceIntervalMilliseconds: 30000\n    readOnly: false\n",
-              // sourceRule: "defaultDatabaseStrategy:\n  inline:\n    algorithmExpression: ds_${user_id % 2}\n    shardingColumn: user_id\ntables:\n  t1:\n    actualDataNodes: ds_0.t1\n    keyGenerateStrategy:\n      column: order_id\n    logicTable: t1\n    tableStrategy:\n      inline:\n        algorithmExpression: t1\n        shardingColumn: order_id\n  t2:\n    actualDataNodes: ds_0.t2\n    keyGenerateStrategy:\n      column: order_item_id\n    logicTable: t2\n    tableStrategy:\n      inline:\n        algorithmExpression: t2\n        shardingColumn: order_id\n",
-              destinationDataSources: {
-                username,
-                password,
-                // url: 'jdbc:mysql://sharding-scaling-mysql:3306/test2?serverTimezone=UTC&useSSL=false'
-                url
+              source: {
+                type: 'shardingSphereJdbc',
+                parameter: {
+                  dataSource: this.textareaDatasource,
+                  rule: this.textareaRule
+                }
+              },
+              target: {
+                type: 'jdbc',
+                parameter: {
+                  username: username,
+                  password: password,
+                  jdbcUrl: url
+                }
               }
             },
             jobConfiguration: {

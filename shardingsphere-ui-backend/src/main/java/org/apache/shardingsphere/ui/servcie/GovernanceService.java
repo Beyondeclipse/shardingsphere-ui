@@ -18,14 +18,14 @@
 package org.apache.shardingsphere.ui.servcie;
 
 import org.apache.shardingsphere.ui.common.dto.InstanceDTO;
-import org.apache.shardingsphere.ui.common.dto.SlaveDataSourceDTO;
+import org.apache.shardingsphere.ui.common.dto.ReplicaDataSourceDTO;
 
 import java.util.Collection;
 
 /**
- * Orchestration operation service.
+ * Governance operation service.
  */
-public interface OrchestrationService {
+public interface GovernanceService {
     
     /**
      * Get all instances.
@@ -43,18 +43,18 @@ public interface OrchestrationService {
     void updateInstanceStatus(String instanceId, boolean enabled);
     
     /**
-     * Get all slave data source.
+     * Get all replica data source.
      *
-     * @return all slaver data source dto
+     * @return all replica data source dto
      */
-    Collection<SlaveDataSourceDTO> getAllSlaveDataSource();
+    Collection<ReplicaDataSourceDTO> getAllReplicaDataSource();
     
     /**
-     * update slave data source status.
+     * update replica data source status.
      *
      * @param schemaNames schema name
-     * @param slaveDataSourceName slave data source name
+     * @param replicaDataSourceName replica data source name
      * @param enabled enabled
      */
-    void updateSlaveDataSourceStatus(String schemaNames, String slaveDataSourceName, boolean enabled);
+    void updateReplicaDataSourceStatus(String schemaNames, String replicaDataSourceName, boolean enabled);
 }

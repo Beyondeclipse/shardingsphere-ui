@@ -15,8 +15,28 @@
  * limitations under the License.
  */
 
-import API from '@/utils/api'
+package org.apache.shardingsphere.ui.common.dto;
 
-export default {
-  loadInstanceStates: (params = {}) => API.get(`/api/cluster-state`, params)
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * Replica data source DTO.
+ */
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public final class ReplicaDataSourceDTO {
+    
+    private String schema;
+    
+    private String primaryDataSourceName;
+    
+    private String replicaDataSourceName;
+    
+    private boolean enabled;
+    
 }

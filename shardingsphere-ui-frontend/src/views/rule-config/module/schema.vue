@@ -43,14 +43,13 @@
     <el-row>
       <el-button type="primary" icon="el-icon-plus" @click="add" />
     </el-row>
-    <el-dialog :visible.sync="showMetadataDialogVisible" :title="type" width="80%" top="3vh">
+    <el-dialog :visible.sync="showMetadataDialogVisible" :title="type" width="60%" top="3vh">
       <el-row :gutter="20">
         <el-col :span="24">
-          <span style="font-size: 18px; font-weight: bold;">Result (JS object dump):</span>
           <el-input
             :rows="20"
             :placeholder="$t('ruleConfig.form.inputPlaceholder')"
-            v-model="textarea2"
+            v-model="textarea"
             type="textarea"
             readonly
             class="show-text"
@@ -61,27 +60,15 @@
         <el-button @click="showMetadataDialogVisible = false">{{ $t('btn.cancel') }}</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="centerDialogVisible" :title="type" width="80%" top="3vh">
+    <el-dialog :visible.sync="centerDialogVisible" :title="type" width="60%" top="3vh">
       <el-row :gutter="20">
-        <el-col :span="12">
-          <span style="font-size: 18px; font-weight: bold;">Edit source here:</span>
+        <el-col :span="24">
           <el-input
             :rows="20"
             :placeholder="$t('ruleConfig.form.inputPlaceholder')"
             v-model="textarea"
             type="textarea"
             class="edit-text"
-          />
-        </el-col>
-        <el-col :span="12">
-          <span style="font-size: 18px; font-weight: bold;">Result (JS object dump):</span>
-          <el-input
-            :rows="20"
-            :placeholder="$t('ruleConfig.form.inputPlaceholder')"
-            v-model="textarea2"
-            type="textarea"
-            readonly
-            class="show-text"
           />
         </el-col>
       </el-row>
@@ -93,7 +80,8 @@
     <el-dialog
       :visible.sync="addSchemaDialogVisible"
       :title="$t('ruleConfig.schema.title')"
-      width="80%" top="3vh">
+      width="80%"
+      top="3vh">
       <el-form ref="form" :model="form" :rules="rules" label-width="170px">
         <el-form-item :label="$t('ruleConfig.schema.name')" prop="name">
           <el-input
@@ -119,17 +107,6 @@
             v-model="form.dataSourceConfig"
             autocomplete="off"
             type="textarea"
-            class="edit-text"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('ruleConfig.schema.metadataConfig')" prop="metadataConfig">
-          <el-input
-            :placeholder="$t('ruleConfig.schemaRules.metadataConfig')"
-            :rows="8"
-            v-model="form.metadataConfig"
-            autocomplete="off"
-            type="string"
-            readonly
             class="edit-text"
           />
         </el-form-item>
@@ -176,8 +153,7 @@ export default {
       form: {
         name: '',
         ruleConfig: '',
-        dataSourceConfig: '',
-        metadataConfig: ''
+        dataSourceConfig: ''
       },
       rules: {
         name: [
@@ -213,15 +189,6 @@ export default {
   },
   computed: {
     textarea2() {
-      const dsYamlType = new yaml.Type(
-        'tag:yaml.org,2002:org.apache.shardingsphere.orchestration.core.configuration.YamlDataSourceConfiguration',
-        {
-          kind: 'mapping',
-          construct(data) {
-            return data !== null ? data : {}
-          }
-        }
-      )
       const shardingYamlType = new yaml.Type(
         '!SHARDING',
         {
@@ -241,7 +208,7 @@ export default {
         }
       )
       const masterSlaveYamlType = new yaml.Type(
-        '!MASTER_SLAVE',
+        '!PRIMARY_REPLICA_REPLICATION',
         {
           kind: 'mapping',
           construct(data) {
@@ -258,7 +225,7 @@ export default {
           }
         }
       )
-      const DS_SCHEMA = yaml.Schema.create([dsYamlType, shardingYamlType, encryptYamlType, masterSlaveYamlType, shadowYamlType])
+      const DS_SCHEMA = yaml.Schema.create([shardingYamlType, encryptYamlType, masterSlaveYamlType, shadowYamlType])
       return JSON.stringify(
         yaml.load(this.textarea, { schema: DS_SCHEMA }),
         null,
@@ -283,7 +250,6 @@ export default {
           this.renderYaml(parent, child, res)
         })
       } else {
-        //child is metadata
         API.getSchemaMetadata(parent).then(res => {
           this.renderMetadataYaml(parent, child, res)
         })
